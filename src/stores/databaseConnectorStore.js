@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import axios from "axios";
+import axiosInstance from '@/utils/axios';
 
 export const useDatabaseConnectorStore = defineStore('databaseConnector', {
   state: () => ({
@@ -7,16 +7,16 @@ export const useDatabaseConnectorStore = defineStore('databaseConnector', {
   }),
 
   actions: {
-    async getDatabaseJwtToken(url, username, password) {
-      const response = await axios.post('http://localhost:8080/database/getDatabaseJwtToken', {
+    async generateJwtToken(url, username, password) {
+      const response = await axiosInstance.post('/database/generateJwtToken', {
         url: url,
         username: username,
         password: password
       });
       localStorage.setItem('jwtToken', response.data);
     },
-    async fetchDatabaseAllTablesMetaData() {
-      const response = await axios.post('http://localhost:8080/database/getDatabaseAllTablesMetaData', {}, {
+    async fetchAllTablesMetaData() {
+      const response = await axiosInstance.post('/database/getAllTablesMetaData', {}, {
         params: {
           jwtToken: localStorage.getItem('jwtToken')
         }}

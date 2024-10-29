@@ -4,7 +4,7 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import DatabaseConnection from '../pages/DatabaseConnection.vue';
 import DatabaseTableMetadata from '../pages/DatabaseTableMetadata.vue';
 import { isTokenValid } from '@/utils/auth';
-import {useDatabaseConnectorStore} from "@/stores/databaseConnectorStore";
+import { useDatabaseConnectorStore } from "@/stores/databaseConnectorStore";
 const routes = [
   {
     path: '/',
@@ -18,7 +18,7 @@ const routes = [
     meta: { requiresAuth: true },
     beforeEnter: async () => {
       const dataStoreConnectorStore = useDatabaseConnectorStore();
-      await dataStoreConnectorStore.fetchDatabaseAllTablesMetaData();
+      await dataStoreConnectorStore.fetchAllTablesMetaData();
       return true;
     }
   }
