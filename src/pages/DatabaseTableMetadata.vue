@@ -18,7 +18,13 @@
           </tr>
         </template>
         <template v-slot:item.tableName="{ item }">
-          <h3 class="table-name">{{ item.tableName }}</h3>
+          <h3 class="table-name">
+            <span v-if="tableNameFilter && item.tableName.toLowerCase().includes(tableNameFilter.toLowerCase())" v-for="s in [item.tableName.slice(0, item.tableName.indexOf(tableNameFilter.toLowerCase())), tableNameFilter.toLowerCase(), item.tableName.slice(item.tableName.indexOf(tableNameFilter.toLowerCase()) + tableNameFilter.toLowerCase().length)]">
+            <span v-if="s === tableNameFilter.toLowerCase()" style="color: #04AA6D">{{ s }}</span>
+            <span v-else>{{ s }}</span>
+          </span>
+            <span v-else>{{ item.tableName }}</span>
+          </h3>
         </template>
         <template v-slot:item.columns="{ item }">
           <v-data-table
@@ -29,7 +35,11 @@
           >
             <template v-slot:item.columnName="{ item }">
               <div>
-                <span>{{ item.columnName }}</span>
+                <span v-if="columnNameFilter && item.columnName.toLowerCase().includes(columnNameFilter.toLowerCase())" v-for="s in [item.columnName.slice(0, item.columnName.indexOf(columnNameFilter.toLowerCase())), columnNameFilter.toLowerCase(), item.columnName.slice(item.columnName.indexOf(columnNameFilter.toLowerCase()) + columnNameFilter.toLowerCase().length)]">
+                  <span v-if="s === columnNameFilter.toLowerCase()" style="color: #04AA6D; font-weight: bold;">{{ s }}</span>
+                  <span v-else>{{ s }}</span>
+                </span>
+                <span v-else>{{ item.columnName }}</span>
                 <span v-if="item.primaryKey">(<b style="color: red">PK</b>)</span>
                 <span v-if="item.foreignKeyMetadata">(<b style="color: blue">FK</b> map to <b>{{ item.foreignKeyMetadata.pkTableName }}</b>.{{ item.foreignKeyMetadata.pkColumnName }})</span>
               </div>
@@ -54,13 +64,14 @@ export default {
   computed: {
     ...mapStores(useDatabaseConnectorStore),
     filteredTablesMetadata() {
+      let result = this.databaseConnectorStore.allTablesMetadata;
       if (this.tableNameFilter) {
-        return this.databaseConnectorStore.allTablesMetadata.filter(t => t.tableName.toLowerCase().includes(this.tableNameFilter.toLowerCase()));
+        result = this.databaseConnectorStore.allTablesMetadata.filter(t => t.tableName.toLowerCase().includes(this.tableNameFilter.toLowerCase()));
       }
       if (this.columnNameFilter) {
-        return this.databaseConnectorStore.allTablesMetadata.filter(t => t.columns.some(c => c.columnName.toLowerCase().includes(this.columnNameFilter.toLowerCase())));
+        result = result.filter(t => t.columns.some(c => c.columnName.toLowerCase().includes(this.columnNameFilter.toLowerCase())));
       }
-      return this.databaseConnectorStore.allTablesMetadata;
+      return result;
     },
     tableHeaders() {
       return [
