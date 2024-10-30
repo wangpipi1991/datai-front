@@ -1,26 +1,37 @@
 <template>
   <div class="database-table-metadata-container">
     <h2 class="title">All Tables' Metadata</h2>
-    <div v-if="allTablesMetadata && allTablesMetadata.length > 0">
+    <div>
       <v-data-table
         density="compact"
         :headers="tableHeaders"
-        :items="allTablesMetadata"
+        :items="filteredTablesMetadata"
       >
+        <template v-slot:body.prepend>
+          <tr>
+            <td>
+              <v-text-field v-model="tableNameFilter" type="text" label="Search By Table Name" variant="outlined" density="compact"></v-text-field>
+            </td>
+            <td>
+              <v-text-field v-model="columnNameFilter" type="text" label="Search By Column Name" variant="outlined" density="compact"></v-text-field>
+            </td>
+          </tr>
+        </template>
         <template v-slot:item.tableName="{ item }">
-          <h3>{{ item.tableName }}</h3>
+          <h3 class="table-name">{{ item.tableName }}</h3>
         </template>
         <template v-slot:item.columns="{ item }">
           <v-data-table
             density="compact"
             :headers="columnHeaders"
             :items="item.columns"
+            :key="item.tableName"
           >
             <template v-slot:item.columnName="{ item }">
               <div>
                 <span>{{ item.columnName }}</span>
                 <span v-if="item.primaryKey">(<b style="color: red">PK</b>)</span>
-                <span v-if="item.foreignKeyMetadata">(<b style="color: blue">FK</b> reference to <b>{{ item.foreignKeyMetadata.pkTableName }}</b>.{{ item.foreignKeyMetadata.pkColumnName }})</span>
+                <span v-if="item.foreignKeyMetadata">(<b style="color: blue">FK</b> map to <b>{{ item.foreignKeyMetadata.pkTableName }}</b>.{{ item.foreignKeyMetadata.pkColumnName }})</span>
               </div>
             </template>
           </v-data-table>
@@ -37,21 +48,33 @@ import { useDatabaseConnectorStore } from "@/stores/databaseConnectorStore";
 
 export default {
   data: () => ({
-    tableHeaders: [
-      { title: 'Table Name', key: 'tableName', align: 'center', width: '20%', sortable: true },
-      { title: 'Table Columns', key: 'columns', align: 'start', width: '80%', sortable: false },
-    ],
-    columnHeaders: [
-      { title: 'Column Name', key: 'columnName', align: 'start', width: '20%' },
-      { title: 'Column Type', key: 'columnType', align: 'start', width: '20%' },
-      { title: 'Column Size', key: 'columnSize', align: 'start', width: '20%' },
-      { title: 'Column Default Value', key: 'columnDefaultValue', align: 'start', width: '20%'}
-    ]
+    tableNameFilter: '',
+    columnNameFilter: ''
   }),
   computed: {
     ...mapStores(useDatabaseConnectorStore),
-    allTablesMetadata() {
+    filteredTablesMetadata() {
+      if (this.tableNameFilter) {
+        return this.databaseConnectorStore.allTablesMetadata.filter(t => t.tableName.toLowerCase().includes(this.tableNameFilter.toLowerCase()));
+      }
+      if (this.columnNameFilter) {
+        return this.databaseConnectorStore.allTablesMetadata.filter(t => t.columns.some(c => c.columnName.toLowerCase().includes(this.columnNameFilter.toLowerCase())));
+      }
       return this.databaseConnectorStore.allTablesMetadata;
+    },
+    tableHeaders() {
+      return [
+        { title: 'Table', key: 'tableName', align: 'start', width: '20%', sortable: true },
+        { title: 'Columns', key: 'columns', align: 'start', width: '80%', sortable: false }
+      ]
+    },
+    columnHeaders() {
+      return [
+        { title: 'Column Name', key: 'columnName', align: 'start', width: '20%', sortable: true },
+        { title: 'Column Type', key: 'columnType', align: 'start', width: '20%', sortable: true },
+        { title: 'Column Size', key: 'columnSize', align: 'start', width: '20%', sortable: true },
+        { title: 'Column Default Value', key: 'columnDefaultValue', align: 'start', width: '20%', sortable: true }
+      ]
     }
   }
 };
@@ -67,6 +90,9 @@ export default {
   }
   .v-data-table {
     border: 1px solid #ddd;
+  }
+  .table-name {
+    text-align: center;
   }
 }
 </style>
