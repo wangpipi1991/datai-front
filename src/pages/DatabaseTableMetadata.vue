@@ -19,8 +19,8 @@
         </template>
         <template v-slot:item.tableName="{ item }">
           <h3 class="table-name">
-            <span v-if="tableNameFilter && item.tableName.toLowerCase().includes(tableNameFilter.toLowerCase())" v-for="s in getWholeWordsArraySplitByKeyWords(item.tableName.toLowerCase(), tableNameFilter.toLowerCase())">
-              <span v-if="s.toLowerCase() === tableNameFilter.toLowerCase()" style="background-color: yellowgreen">{{ s }}</span>
+            <span v-if="tableNameFilter && item.tableName.includes(tableNameFilter)" v-for="s in getWholeWordsArraySplitByKeyWords(item.tableName, tableNameFilter)">
+              <span v-if="s === tableNameFilter" style="background-color: greenyellow">{{ s }}</span>
               <span v-else>{{ s }}</span>
             </span>
             <span v-else>{{ item.tableName }}</span>
@@ -35,8 +35,8 @@
           >
             <template v-slot:item.columnName="{ item }">
               <div>
-                <span v-if="columnNameFilter && item.columnName.toLowerCase().includes(columnNameFilter.toLowerCase())" v-for="s in getWholeWordsArraySplitByKeyWords(item.columnName.toLowerCase(), columnNameFilter.toLowerCase())">
-                  <span v-if="s.toLowerCase() === columnNameFilter.toLowerCase()" style="background-color: greenyellow; font-weight: bold;">{{ s }}</span>
+                <span v-if="columnNameFilter && item.columnName.includes(columnNameFilter)" v-for="s in getWholeWordsArraySplitByKeyWords(item.columnName, columnNameFilter)">
+                  <span v-if="s === columnNameFilter" style="background-color: greenyellow; font-weight: bold;">{{ s }}</span>
                   <span v-else>{{ s }}</span>
                 </span>
                 <span v-else>{{ item.columnName }}</span>
@@ -66,10 +66,10 @@ export default {
     filteredTablesMetadata() {
       let result = this.databaseConnectorStore.allTablesMetadata;
       if (this.tableNameFilter) {
-        result = this.databaseConnectorStore.allTablesMetadata.filter(t => t.tableName.toLowerCase().includes(this.tableNameFilter.toLowerCase()));
+        result = this.databaseConnectorStore.allTablesMetadata.filter(t => t.tableName.includes(this.tableNameFilter));
       }
       if (this.columnNameFilter) {
-        result = result.filter(t => t.columns.some(c => c.columnName.toLowerCase().includes(this.columnNameFilter.toLowerCase())));
+        result = result.filter(t => t.columns.some(c => c.columnName.includes(this.columnNameFilter)));
       }
       return result;
     },
