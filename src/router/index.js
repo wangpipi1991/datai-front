@@ -18,7 +18,7 @@ const routes = [
     meta: { requiresAuth: true },
     beforeEnter: async () => {
       const dataStoreConnectorStore = useDatabaseConnectorStore();
-      await dataStoreConnectorStore.fetchAllTablesMetaData();
+      if (dataStoreConnectorStore.allTablesMetadata.length === 0) await dataStoreConnectorStore.fetchAllTablesMetaData();
       return true;
     }
   }

@@ -37,6 +37,7 @@ export default {
       if (!this.form) return;
       try {
         await this.databaseConnectorStore.generateJwtToken(this.url, this.username, this.password);
+        await this.databaseConnectorStore.fetchAllTablesMetaData();
         this.$router.push({ name: 'DatabaseTableMetadata'});
       } catch (error) {
         this.error = `Failed to connect to database due to ${error.response.data}`;
