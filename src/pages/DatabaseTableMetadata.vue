@@ -19,10 +19,10 @@
         </template>
         <template v-slot:item.tableName="{ item }">
           <h3 class="table-name">
-            <span v-if="tableNameFilter && item.tableName.toLowerCase().includes(tableNameFilter.toLowerCase())" v-for="s in [item.tableName.slice(0, item.tableName.indexOf(tableNameFilter.toLowerCase())), tableNameFilter.toLowerCase(), item.tableName.slice(item.tableName.indexOf(tableNameFilter.toLowerCase()) + tableNameFilter.toLowerCase().length)]">
-            <span v-if="s === tableNameFilter.toLowerCase()" style="color: #04AA6D">{{ s }}</span>
-            <span v-else>{{ s }}</span>
-          </span>
+            <span v-if="tableNameFilter && item.tableName.toLowerCase().includes(tableNameFilter.toLowerCase())" v-for="s in getWholeWordsArraySplitByKeyWords(item.tableName.toLowerCase(), tableNameFilter.toLowerCase())">
+              <span v-if="s.toLowerCase() === tableNameFilter.toLowerCase()" style="background-color: yellowgreen">{{ s }}</span>
+              <span v-else>{{ s }}</span>
+            </span>
             <span v-else>{{ item.tableName }}</span>
           </h3>
         </template>
@@ -35,8 +35,8 @@
           >
             <template v-slot:item.columnName="{ item }">
               <div>
-                <span v-if="columnNameFilter && item.columnName.toLowerCase().includes(columnNameFilter.toLowerCase())" v-for="s in [item.columnName.slice(0, item.columnName.indexOf(columnNameFilter.toLowerCase())), columnNameFilter.toLowerCase(), item.columnName.slice(item.columnName.indexOf(columnNameFilter.toLowerCase()) + columnNameFilter.toLowerCase().length)]">
-                  <span v-if="s === columnNameFilter.toLowerCase()" style="color: #04AA6D; font-weight: bold;">{{ s }}</span>
+                <span v-if="columnNameFilter && item.columnName.toLowerCase().includes(columnNameFilter.toLowerCase())" v-for="s in getWholeWordsArraySplitByKeyWords(item.columnName.toLowerCase(), columnNameFilter.toLowerCase())">
+                  <span v-if="s.toLowerCase() === columnNameFilter.toLowerCase()" style="background-color: greenyellow; font-weight: bold;">{{ s }}</span>
                   <span v-else>{{ s }}</span>
                 </span>
                 <span v-else>{{ item.columnName }}</span>
@@ -86,6 +86,11 @@ export default {
         { title: 'Column Size', key: 'columnSize', align: 'start', width: '20%', sortable: true },
         { title: 'Column Default Value', key: 'columnDefaultValue', align: 'start', width: '20%', sortable: true }
       ]
+    }
+  },
+  methods: {
+    getWholeWordsArraySplitByKeyWords(wholeWords, keywords) {
+      return [wholeWords.slice(0, wholeWords.indexOf(keywords)), keywords, wholeWords.slice(wholeWords.indexOf(keywords) + keywords.length)];
     }
   }
 };
